@@ -50,10 +50,12 @@ internal class SceneResources {
     val mat: Material = pbr(CloudAirColors.BoardIvory, roughness = 0.9f, glow = 0.10f)
     val frame: Material = pbr(CloudAirColors.MatFrame, roughness = 0.9f, glow = 0.12f)
     val neutral: Material = pbr(CloudAirColors.RunwayPale, roughness = 0.85f, glow = 0.12f)
-    val ivory: Material = pbr(CloudAirColors.BoardIvory, roughness = 0.7f, glow = 0.18f)
-    val light: Map<Team, Material> = Team.entries.associateWith { pbr(CloudAirColors.of(it), roughness = 0.75f, glow = 0.14f) }
-    val mid: Map<Team, Material> = Team.entries.associateWith { pbr(CloudAirColors.midOf(it), roughness = 0.7f, glow = 0.14f) }
-    val lane: Map<Team, Material> = Team.entries.associateWith { pbr(CloudAirColors.laneOf(it), roughness = 0.7f, glow = 0.14f) }
+    // Skin v2: tiles and rims are satin lacquer, the circles and spots glazed enamel, the hangar pads matte
+    // like the felt in the tray; frame, mat, tower and tray themselves come from board.glb / tray.glb.
+    val ivory: Material = pbr(CloudAirColors.BoardIvory, roughness = 0.45f, glow = 0.18f)
+    val light: Map<Team, Material> = Team.entries.associateWith { pbr(CloudAirColors.of(it), roughness = 0.92f, glow = 0.14f) }
+    val mid: Map<Team, Material> = Team.entries.associateWith { pbr(CloudAirColors.midOf(it), roughness = 0.5f, glow = 0.14f) }
+    val lane: Map<Team, Material> = Team.entries.associateWith { pbr(CloudAirColors.laneOf(it), roughness = 0.5f, glow = 0.14f) }
     val deep: Map<Team, Material> = Team.entries.associateWith { pbr(CloudAirColors.deepOf(it), roughness = 0.7f, glow = 0.3f) }
     val glow: Material = pbr(CloudAirColors.RouteGlow, roughness = 0.6f, glow = 0.7f)
     val tray: Material = pbr(CloudAirColors.TrayStone, roughness = 0.9f, glow = 0.16f)

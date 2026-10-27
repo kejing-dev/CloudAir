@@ -1,74 +1,225 @@
-"""Generates the app's short sound effects (16-bit mono WAV, 22.05 kHz) from pure Python, no samples used."""
-import math, random, struct, wave, os, sys
+"""Generates the app's short sound effects (16-bit mono WAV, 22.05 kHz) from code, no samples used.
+
+  python tools/make_sounds.py            writes app/src/main/assets/sounds/*.wav
+  python tools/make_sounds.py --check    prints peak / loudness / spectrum of every file
+
+Skin v2 (2026-10-26): everything is soft-attack and low-passed. The dice are a resin die on a felt
+floor inside a wooden tray: a muted thud with short wood modes, never a white-noise clack. Every
+sound is normalised to its own peak target (dice -12 dBFS, the rest -11 ... -15 dBFS) so nothing
+pokes out of the mix; the SoundPlayer volumes stay as they were.
+"""
+import math
+import os
+import random
+import struct
+import sys
+import wave
+
+import numpy as np
 
 RATE = 22050
 OUT = os.path.join(os.path.dirname(__file__), '..', 'app', 'src', 'main', 'assets', 'sounds')
 
-def env(i, n, attack, release):
-    a = min(1.0, i / max(1, attack))
-    r = min(1.0, (n - i) / max(1, release))
-    return min(a, r)
 
-def tone(freq, seconds, vol=0.5, attack=0.01, release=0.08, shape='sine', glide=0.0):
+# ---- building blocks ----
+
+def silence(seconds):
+    return np.zeros(int(RATE * seconds))
+
+
+def t_axis(seconds):
+    return np.arange(int(RATE * seconds)) / RATE
+
+
+def biquad(x, kind, freq, q=0.707):
+    """RBJ cookbook biquad, direct form I."""
+    w = 2 * math.pi * freq / RATE
+    cw, sw = math.cos(w), math.sin(w)
+    alpha = sw / (2 * q)
+    if kind == 'low':
+        b = [(1 - cw) / 2, 1 - cw, (1 - cw) / 2]
+    elif kind == 'high':
+        b = [(1 + cw) / 2, -(1 + cw), (1 + cw) / 2]
+    else:  # band, constant 0 dB peak
+        b = [alpha, 0.0, -alpha]
+    a = [1 + alpha, -2 * cw, 1 - alpha]
+    b = [v / a[0] for v in b]
+    a1, a2 = a[1] / a[0], a[2] / a[0]
+    y = np.zeros_like(x)
+    x1 = x2 = y1 = y2 = 0.0
+    for i, v in enumerate(x):
+        out = b[0] * v + b[1] * x1 + b[2] * x2 - a1 * y1 - a2 * y2
+        x2, x1, y2, y1 = x1, v, y1, out
+        y[i] = out
+    return y
+
+
+def lowpass(x, freq, passes=2):
+    for _ in range(passes):
+        x = biquad(x, 'low', freq)
+    return x
+
+
+def attack_env(n, attack):
+    """Raised-cosine attack of `attack` seconds, 1 afterwards: no step at the start."""
+    e = np.ones(n)
+    k = max(2, int(RATE * attack))
+    e[:k] = 0.5 - 0.5 * np.cos(np.linspace(0, math.pi, k))
+    return e
+
+
+def fade_tail(x, seconds=0.006):
+    k = min(len(x), int(RATE * seconds))
+    x = x.copy()
+    x[-k:] *= 0.5 + 0.5 * np.cos(np.linspace(0, math.pi, k))
+    return x
+
+
+def place(dst, src, at):
+    i = int(RATE * at)
+    if i + len(src) > len(dst):
+        dst = np.concatenate([dst, np.zeros(i + len(src) - len(dst))])
+    dst[i:i + len(src)] += src
+    return dst
+
+
+def mode(freq, decay, seconds, attack=0.0015, phase=0.0):
+    """A damped sinusoid: one resonance of a struck body."""
+    t = t_axis(seconds)
+    # The tail is tapered to zero: a resonance cut off mid-decay clicks.
+    return fade_tail(np.sin(2 * math.pi * freq * t + phase) * np.exp(-t / decay) * attack_env(len(t), attack), seconds * 0.4)
+
+
+def knock(strength, brightness, rnd, seconds=0.12):
+    """One contact of the die: a felt-damped thud plus a few short wood/resin modes."""
+    d = 1 + rnd.uniform(-0.06, 0.06)
+    # Headset speakers barely reproduce < 300 Hz, so the body of the knock sits at 600 Hz - 1.3 kHz.
+    x = 0.45 * mode(260 * d, 0.02, seconds, attack=0.002)
+    x += 0.8 * mode(640 * d, 0.028, seconds, phase=rnd.uniform(0, 6.28))
+    x += 0.45 * brightness * mode(1260 * d, 0.014, seconds, phase=rnd.uniform(0, 6.28))
+    x += 0.16 * brightness * mode(2150 * d, 0.006, seconds, phase=rnd.uniform(0, 6.28))
+    burst = np.array([rnd.uniform(-1, 1) for _ in range(int(RATE * 0.008))])
+    burst = biquad(burst, 'band', 1100, q=1.2) * attack_env(len(burst), 0.0015) * np.linspace(1, 0, len(burst))
+    x = place(x, 0.35 * brightness * burst, 0)
+    return strength * fade_tail(lowpass(x, 2600), seconds * 0.3)
+
+
+def swish(seconds, f_from, f_to, rnd, attack=0.06):
+    """Filtered air: a band of noise whose centre glides from f_from to f_to."""
     n = int(RATE * seconds)
-    out = []
-    phase = 0.0
-    for i in range(n):
-        f = freq * (1 + glide * i / n)
-        phase += 2 * math.pi * f / RATE
-        if shape == 'sine': s = math.sin(phase)
-        elif shape == 'tri': s = 2 / math.pi * math.asin(math.sin(phase))
-        else: s = 1.0 if math.sin(phase) > 0 else -1.0
-        out.append(s * vol * env(i, n, attack * RATE, release * RATE))
-    return out
+    raw = np.array([rnd.uniform(-1, 1) for _ in range(n)])
+    out = np.zeros(n)
+    block = 256
+    for s in range(0, n, block):
+        u = s / n
+        f = f_from * (f_to / f_from) ** u
+        seg = biquad(raw[max(0, s - 512):s + block], 'band', f, q=1.4)
+        out[s:s + block] = seg[-len(out[s:s + block]):]
+    env = np.sin(np.linspace(0, math.pi, n)) ** 1.5 * attack_env(n, attack)
+    # Overlapping the filter blocks keeps the band continuous; one more low-pass removes block edges.
+    return lowpass(out * env, 3000, passes=1)
 
-def noise(seconds, vol=0.4, attack=0.005, release=0.05, lowpass=0.3, seed=1):
-    rnd = random.Random(seed)
-    n = int(RATE * seconds)
-    out = []
-    last = 0.0
-    for i in range(n):
-        v = rnd.uniform(-1, 1)
-        last = last + lowpass * (v - last)
-        out.append(last * vol * env(i, n, attack * RATE, release * RATE))
-    return out
 
-def mix(*parts):
-    n = max(len(p) for p in parts)
-    out = [0.0] * n
-    for p in parts:
-        for i, v in enumerate(p): out[i] += v
-    return out
+def note(freq, seconds, decay, partials=((1, 1.0), (2, 0.22), (3, 0.07)), attack=0.004):
+    """A soft mallet note (marimba / bell-ish): a few harmonics with their own decays."""
+    t = t_axis(seconds)
+    x = np.zeros_like(t)
+    for k, a in partials:
+        x += a * np.sin(2 * math.pi * freq * k * t) * np.exp(-t * k / decay)
+    return lowpass(fade_tail(x * attack_env(len(t), attack), seconds * 0.4), 3200, passes=1)
 
-def delay(part, seconds):
-    return [0.0] * int(RATE * seconds) + part
 
-def write(name, samples):
-    peak = max(1e-6, max(abs(s) for s in samples))
-    k = 0.9 / peak if peak > 0.9 else 1.0
+def write(name, x, peak_db):
+    x = biquad(np.asarray(x, dtype=float), 'high', 45)   # no DC, no rumble
+    x = fade_tail(x)
+    x = x * (10 ** (peak_db / 20) / max(1e-9, np.abs(x).max()))
     os.makedirs(OUT, exist_ok=True)
     with wave.open(os.path.join(OUT, name + '.wav'), 'wb') as w:
-        w.setnchannels(1); w.setsampwidth(2); w.setframerate(RATE)
-        w.writeframes(b''.join(struct.pack('<h', int(max(-1, min(1, s * k)) * 32767)) for s in samples))
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(RATE)
+        w.writeframes(b''.join(struct.pack('<h', int(round(max(-1, min(1, v)) * 32767))) for v in x))
 
-# dice_throw: three quick wooden rattles
-write('dice_throw', mix(noise(0.05, 0.5, lowpass=0.5, seed=1), delay(noise(0.04, 0.4, lowpass=0.6, seed=2), 0.08), delay(noise(0.05, 0.45, lowpass=0.45, seed=3), 0.17)))
-# dice_land: a clack with a short wooden ring
-write('dice_land', mix(noise(0.03, 0.7, lowpass=0.8, seed=4), tone(620, 0.09, 0.25, 0.002, 0.07), tone(1240, 0.05, 0.1, 0.002, 0.04)))
-# takeoff: rising airy whoosh
-write('takeoff', mix(noise(0.32, 0.35, attack=0.08, release=0.15, lowpass=0.12, seed=5), tone(420, 0.3, 0.12, 0.05, 0.15, glide=0.6)))
-# hop: soft tick
-write('hop', mix(tone(880, 0.05, 0.25, 0.003, 0.04), noise(0.02, 0.15, lowpass=0.7, seed=6)))
-# jump: a quick rising two-note
-write('jump', mix(tone(523, 0.1, 0.3, 0.005, 0.06), delay(tone(784, 0.14, 0.3, 0.005, 0.1), 0.09)))
-# fly: longer whoosh with a sweep
-write('fly', mix(noise(0.6, 0.3, attack=0.15, release=0.3, lowpass=0.1, seed=7), tone(330, 0.55, 0.1, 0.1, 0.3, glide=1.2)))
-# capture: a descending blip, friendly not punishing
-write('capture', mix(tone(660, 0.12, 0.3, 0.005, 0.08, glide=-0.35), delay(tone(440, 0.16, 0.25, 0.005, 0.12, glide=-0.3), 0.1)))
-# home: two warm chime notes
-write('home', mix(tone(659, 0.25, 0.3, 0.005, 0.2), delay(tone(988, 0.35, 0.3, 0.005, 0.3), 0.12), delay(tone(1319, 0.3, 0.15, 0.005, 0.25), 0.24)))
-# win: a little fanfare
-write('win', mix(tone(523, 0.18, 0.3, 0.005, 0.1), delay(tone(659, 0.18, 0.3, 0.005, 0.1), 0.16), delay(tone(784, 0.18, 0.3, 0.005, 0.1), 0.32), delay(tone(1047, 0.5, 0.35, 0.005, 0.4), 0.48)))
-# tap: UI click
-write('tap', mix(tone(1200, 0.03, 0.25, 0.002, 0.02), noise(0.015, 0.2, lowpass=0.9, seed=8)))
+
+def check():
+    print(f"{'file':16s} {'dur':>5s} {'peak':>6s} {'loud':>6s} {'cent':>6s} {'>3k%':>5s} {'>5k%':>5s} {'step':>6s}")
+    for name in sorted(os.listdir(OUT)):
+        with wave.open(os.path.join(OUT, name)) as w:
+            x = np.frombuffer(w.readframes(w.getnframes()), dtype='<i2').astype(float) / 32768
+        win = int(RATE * 0.05)
+        loud = max(np.sqrt(np.mean(x[i:i + win] ** 2)) for i in range(0, max(1, len(x) - win), win // 2))
+        s = np.abs(np.fft.rfft(x * np.hanning(len(x)))) ** 2
+        f = np.fft.rfftfreq(len(x), 1 / RATE)
+        print(f"{name:16s} {len(x) / RATE:5.2f} {20 * np.log10(np.abs(x).max()):6.1f} {20 * np.log10(loud):6.1f} "
+              f"{(s * f).sum() / s.sum():6.0f} {s[f > 3000].sum() / s.sum() * 100:5.1f} {s[f > 5000].sum() / s.sum() * 100:5.1f} "
+              f"{np.abs(np.diff(x)).max():6.3f}")
+
+
+if '--check' in sys.argv:
+    check()
+    sys.exit(0)
+
+rnd = random.Random(7)
+
+# dice_throw: the die leaves a cupped hand, a couple of soft rattles and a little air.
+x = silence(0.26)
+x = place(x, 0.30 * swish(0.22, 500, 1300, rnd), 0.0)
+for at, s in ((0.0, 0.55), (0.05, 0.4), (0.11, 0.3)):
+    x = place(x, knock(s, 0.35, rnd), at)
+write('dice_throw', x, -14)
+
+# dice_land: first contact on the felt, then a few smaller tumbles and a short felt rustle.
+x = silence(0.5)
+for at, s, b in ((0.0, 1.0, 0.7), (0.085, 0.55, 0.55), (0.16, 0.34, 0.45), (0.215, 0.2, 0.35), (0.26, 0.11, 0.3)):
+    x = place(x, knock(s, b, rnd), at)
+rustle = np.array([rnd.uniform(-1, 1) for _ in range(int(RATE * 0.3))])
+rustle = lowpass(rustle, 700) * np.exp(-t_axis(0.3) / 0.09) * attack_env(len(rustle), 0.01)
+x = place(x, 0.12 * rustle, 0.01)
+write('dice_land', x, -12)
+
+# takeoff: a rising airy whoosh with a soft engine hum under it.
+x = 0.8 * swish(0.42, 350, 1500, rnd, attack=0.1)
+hum = t_axis(0.42)
+x = x + 0.25 * np.sin(2 * math.pi * (180 * hum + 120 * hum ** 2)) * np.sin(np.linspace(0, math.pi, len(hum))) ** 2
+write('takeoff', lowpass(x, 2800, passes=1), -14)
+
+# hop: a piece set down on the board, quieter and duller than a die.
+write('hop', knock(1.0, 0.4, random.Random(11), seconds=0.07), -13)
+
+# jump: two rising mallet notes.
+x = silence(0.4)
+x = place(x, note(523.25, 0.25, 0.22), 0.0)
+x = place(x, note(783.99, 0.32, 0.26), 0.09)
+write('jump', x, -13)
+
+# fly: a long whoosh with a slow glide.
+x = 0.8 * swish(0.75, 300, 1700, rnd, attack=0.18)
+g = t_axis(0.75)
+x = x + 0.18 * np.sin(2 * math.pi * (220 * g + 160 * g ** 2)) * np.sin(np.linspace(0, math.pi, len(g))) ** 2
+write('fly', lowpass(x, 2800, passes=1), -14)
+
+# capture: a friendly descending pair, not a buzzer.
+x = silence(0.45)
+x = place(x, note(659.25, 0.26, 0.2), 0.0)
+x = place(x, note(440.0, 0.32, 0.24), 0.1)
+write('capture', x, -13)
+
+# home: three warm chime notes.
+bell = ((1, 1.0), (2.0, 0.18), (3.0, 0.05), (4.2, 0.03))
+x = silence(0.9)
+for at, f in ((0.0, 659.25), (0.12, 987.77), (0.24, 1318.5)):
+    x = place(x, note(f, 0.6, 0.45, partials=bell, attack=0.006), at)
+write('home', x, -12)
+
+# win: a little fanfare.
+x = silence(1.4)
+for at, f, d in ((0.0, 523.25, 0.3), (0.16, 659.25, 0.3), (0.32, 783.99, 0.3), (0.48, 1046.5, 0.8)):
+    x = place(x, note(f, d + 0.3, d, partials=bell, attack=0.006), at)
+write('win', x, -11)
+
+# tap: a soft UI click.
+x = 0.8 * mode(880, 0.012, 0.05, attack=0.0015) + 0.25 * mode(1760, 0.006, 0.05, attack=0.0015)
+write('tap', lowpass(x, 3000, passes=1), -13)
+
 print('wrote', sorted(os.listdir(OUT)))
+check()

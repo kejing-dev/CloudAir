@@ -81,12 +81,17 @@ internal fun BoardView(state: BoardUiState, onEvent: (SceneEvent) -> Unit, modif
                 .onFailure { Log.e(BoardScene.TAG, "plane model failed", it) }.getOrNull()
             val die = runCatching { Entity.loadSuspend("asset://models/die.glb") }
                 .onFailure { Log.e(BoardScene.TAG, "die model failed", it) }.getOrNull()
+            // The skin's frame / mat / tower and the dice tray; without them the scene falls back to primitives.
+            val board = runCatching { Entity.loadSuspend("asset://models/board.glb") }
+                .onFailure { Log.e(BoardScene.TAG, "board model failed", it) }.getOrNull()
+            val tray = runCatching { Entity.loadSuspend("asset://models/tray.glb") }
+                .onFailure { Log.e(BoardScene.TAG, "tray model failed", it) }.getOrNull()
             if (plane != null && die != null) {
                 plane.setName("planeTemplate")
                 plane.enabled = false
                 content.addEntity(plane)
-                Log.i(BoardScene.TAG, "MODELS loaded plane children=${plane.getChildrenCount()} die children=${die.getChildrenCount()}")
-                scene.install(plane, die)
+                Log.i(BoardScene.TAG, "MODELS loaded plane children=${plane.getChildrenCount()} die children=${die.getChildrenCount()} board=${board?.getChildrenCount()} tray=${tray?.getChildrenCount()}")
+                scene.install(plane, die, board, tray)
             }
         },
         update = { content, _ ->

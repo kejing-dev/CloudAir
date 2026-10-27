@@ -34,9 +34,9 @@ import kotlin.math.sin
  * ```
  * SpatialView
  * └ root                     the mat's top surface is y = 0 here; tipped toward the player
- *   ├ frame, mat, loop tiles (+ circles), lanes, hangars (slab, rims, spots), hub + tower, arrows, dashes
+ *   ├ board skin (frame, mat, hub + tower; board.glb), loop tiles (+ circles), lanes, hangars (slab, rims, spots), arrows, dashes
  *   ├ fleets: PlaneView per plane of every seat, rings under planes that may be picked
- *   └ tray: floor, four walls, the die, the die's invitation ring
+ *   └ tray skin (tray.glb: shell + felt), the die, the die's invitation ring
  * ```
  *
  * All calls come from the main thread: [install]/[apply] from Compose, [onFrame] from the ECS system.
@@ -47,6 +47,8 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
     private var res: SceneResources? = null
     private var planeTemplate: Entity? = null
     private var dieRoot: Entity? = null
+    private var boardModel: Entity? = null
+    private var trayModel: Entity? = null
     private var built = false
 
     private class Tile(val entity: ModelEntity, val material: Material, val position: P3)
@@ -90,10 +92,15 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
         tryBuild()
     }
 
-    /** The loaded models: the airplane used as a template for every fleet, and the die. */
-    fun install(plane: Entity, die: Entity) {
+    /**
+     * The loaded models: the airplane used as a template for every fleet, the die, and the skin's board
+     * (frame, mat, hub and tower) and dice tray. Without a board or tray model those parts are primitives.
+     */
+    fun install(plane: Entity, die: Entity, board: Entity? = null, tray: Entity? = null) {
         planeTemplate = plane
         dieRoot = die
+        boardModel = board
+        trayModel = tray
         tryBuild()
     }
 
@@ -157,8 +164,15 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
     }
 
     private fun buildMat(r: SceneResources) {
-        add(r.frameSlab, r.frame, P3(0f, -BoardLayout.MAT_THICKNESS * 1.3f, 0f), "frame")
-        add(r.matSlab, r.mat, P3(0f, -BoardLayout.MAT_THICKNESS / 2, 0f), "mat")
+        // board.glb: bent-wood frame, linen mat with its binding, the hub and the turned tower, origin on the mat's top centre.
+        val board = boardModel
+        if (board != null) {
+            board.setName("boardSkin")
+            root.addChild(board)
+        } else {
+            add(r.frameSlab, r.frame, P3(0f, -BoardLayout.MAT_THICKNESS * 1.3f, 0f), "frame")
+            add(r.matSlab, r.mat, P3(0f, -BoardLayout.MAT_THICKNESS / 2, 0f), "mat")
+        }
         val proud = BoardLayout.TILE_HEIGHT + 0.0009f
         // Loop tiles, coloured by the cycle of four; the notch cells as diamonds; a white circle on every cell.
         for (i in Board.loop.indices) {
@@ -227,10 +241,12 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
             val wedgeAt = BoardLayout.of(Board.rotate(GridPoint(6.4, 7.0), team.ordinal), BoardLayout.TILE_HEIGHT * 0.55f)
             add(r.centerWedge, r.deep.getValue(team), wedgeAt, "wedge:$team", (PI / 4).toFloat())
         }
-        // The hub and the control tower.
-        add(r.hub, r.ivory, P3(0f, BoardLayout.HUB_HEIGHT / 2, 0f), "hub")
-        add(r.tower, r.ivory, P3(0f, BoardLayout.HUB_HEIGHT + BoardLayout.TOWER_HEIGHT / 2, 0f), "tower")
-        add(r.cab, r.frame, P3(0f, BoardLayout.HUB_HEIGHT + BoardLayout.TOWER_HEIGHT + BoardLayout.CAB_HEIGHT / 2, 0f), "cab")
+        // The hub and the control tower (in board.glb when it loaded).
+        if (board == null) {
+            add(r.hub, r.ivory, P3(0f, BoardLayout.HUB_HEIGHT / 2, 0f), "hub")
+            add(r.tower, r.ivory, P3(0f, BoardLayout.HUB_HEIGHT + BoardLayout.TOWER_HEIGHT / 2, 0f), "tower")
+            add(r.cab, r.frame, P3(0f, BoardLayout.HUB_HEIGHT + BoardLayout.TOWER_HEIGHT + BoardLayout.CAB_HEIGHT / 2, 0f), "cab")
+        }
         beacon = add(r.beacon, r.deep.getValue(Team.MINT), P3(0f, BoardLayout.HUB_HEIGHT + BoardLayout.TOWER_HEIGHT + BoardLayout.CAB_HEIGHT + 0.002f, 0f), "beacon")
         // Rings for planes the player may pick: a pool of four, hidden until needed.
         repeat(4) { i ->
@@ -241,14 +257,22 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
     private fun buildTray(r: SceneResources) {
         val c = BoardLayout.TRAY_CENTER
         val k = BoardLayout.DIE_SCALE
-        add(r.trayFloorMesh, r.trayFloor, P3(c.x, c.y - BoardLayout.TRAY_FLOOR_THICKNESS / 2, c.z), "trayFloor")
-        val wallY = c.y + DiceSolverUnits.WALL_HEIGHT * k / 2
-        val dx = (DiceSolverUnits.TRAY_WIDTH / 2 + DiceSolverUnits.WALL / 2) * k
-        val dz = (DiceSolverUnits.TRAY_DEPTH / 2 + DiceSolverUnits.WALL / 2) * k
-        add(r.trayWallX, r.tray, P3(c.x - dx, wallY, c.z), "trayWallL")
-        add(r.trayWallX, r.tray, P3(c.x + dx, wallY, c.z), "trayWallR")
-        add(r.trayWallZ, r.tray, P3(c.x, wallY, c.z - dz), "trayWallB")
-        add(r.trayWallZ, r.tray, P3(c.x, wallY, c.z + dz), "trayWallF")
+        // tray.glb: wooden shell round the solver's inner box, felt top at the floor (origin = TRAY_CENTER).
+        val tray = trayModel
+        if (tray != null) {
+            tray.setName("traySkin")
+            tray.transform().setPosition(Vector3(c.x, c.y, c.z))
+            root.addChild(tray)
+        } else {
+            add(r.trayFloorMesh, r.trayFloor, P3(c.x, c.y - BoardLayout.TRAY_FLOOR_THICKNESS / 2, c.z), "trayFloor")
+            val wallY = c.y + DiceSolverUnits.WALL_HEIGHT * k / 2
+            val dx = (DiceSolverUnits.TRAY_WIDTH / 2 + DiceSolverUnits.WALL / 2) * k
+            val dz = (DiceSolverUnits.TRAY_DEPTH / 2 + DiceSolverUnits.WALL / 2) * k
+            add(r.trayWallX, r.tray, P3(c.x - dx, wallY, c.z), "trayWallL")
+            add(r.trayWallX, r.tray, P3(c.x + dx, wallY, c.z), "trayWallR")
+            add(r.trayWallZ, r.tray, P3(c.x, wallY, c.z - dz), "trayWallB")
+            add(r.trayWallZ, r.tray, P3(c.x, wallY, c.z + dz), "trayWallF")
+        }
         // The tray itself is a tap target too: a pinch anywhere in it throws the die.
         val trayTarget = Entity().apply {
             setName(TRAY_NAME)

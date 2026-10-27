@@ -6,8 +6,10 @@ Two surfaces:
 - **Cloud airport** (default container `CloudBoard`, Volumetric 0.78 × 0.5 × 1.0 m, no base panel, fixed world
   scale): the classic mat (0.72 m, tipped 28° toward the player) as a 15 × 15 grid of tiles with a circle on every
   cell, four corner hangars with rims (the active one is deep-coloured and lifted), a 52-cell loop round the cross,
-  four home lanes to the centre hub with its control tower, the Blender airplane per plane, and a dark-felt dice
-  tray in front of the mat with the Blender die (a ring under it while the human may roll). A pinch on the die or
+  four home lanes to the centre hub with its control tower, the Blender airplane per plane, and a dice tray in front
+  of the mat with the Blender die. Skin v2 (`design/skin-v2/`): linen mat, sage binding, bent-oak frame and a turned
+  porcelain tower come from `models/board.glb`; the oak tray with its padded felt comes from `models/tray.glb`.
+  Both are built by `tools/build_skin.py`, and the scene falls back to the v1 primitives if a GLB fails to load (a ring under it while the human may roll). A pinch on the die or
   the tray throws; a pinch on a plane picks it in manual mode (rings mark the candidates).
 - **Control window** (`WindowContainer("CloudControl")`, Planar 560 × 340 dp, `Placement.right(board)`): home,
   setup (2–4 seats, human / AI easy / AI smart), the turn page (die, roll button, status, fleets), six choice, plane
@@ -65,6 +67,11 @@ edge, column 0 the left edge; cell pitch `BoardLayout.CELL` = 0.72 / 15 m. `Boar
   `ContextImpl`, and composing the board under it crashes at launch ("not attached to an Activity, cannot
   retrieve SpatialContainer") as soon as a non-system language is persisted. `CloudAirTheme.localized` therefore
   wraps the Activity context in a `ContextWrapper` that only overrides `getResources()`.
+- `board.glb` / `tray.glb` are in board metres. Their origins are the mat's top centre and `TRAY_CENTER`
+  (felt top = solver floor). The tray's inner box must stay the solver's 2.8 × 1.8 × 0.5 units × `DIE_SCALE`, so
+  change `DiceSolver` and `tools/build_skin.py` together. The tap target is still the thin `trayShape` collider,
+  never the GLB. Sounds come from `tools/make_sounds.py`. Keep peaks at -11 … -16 dBFS with nothing above
+  ~3 kHz, and check with `--check`.
 - Moves are timelines of clips (`Motion.kt`): walks are one hop per cell; the plane's attitude (pitch, bank, the
   fly-over barrel roll) lives on the `attitude` entity between holder and lift in `PlaneView`.
 
