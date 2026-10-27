@@ -1,0 +1,599 @@
+<title>云间航线 Cloud Air</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Sans:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a toy-box rulebook. A sticky section rail on wide screens, plates of content on an ivory mat,
+   and one live board drawn from the shipping geometry as the centrepiece. */
+:root {
+  --mat: #F2F3EB;
+  --plate: #FBFBF6;
+  --ink: #203C39;
+  --ink-2: #4C6662;
+  --ink-3: #7A8D88;
+  --rule: #D6DFD8;
+  --teal: #246F66;
+  --teal-ink: #FFFFFF;
+  --felt: #3F5E58;
+  --glow: #FFF1C7;
+  --mint: #A8DCCB; --mint-mid: #74B3A1; --mint-lane: #61A491; --mint-deep: #277661;
+  --sky: #A9D3F2; --sky-mid: #7CABCF; --sky-lane: #6B9BC2; --sky-deep: #386E9B;
+  --apricot: #F6C9A8; --apricot-mid: #CEA17C; --apricot-lane: #C0916C; --apricot-deep: #93643B;
+  --lavender: #C9BDE8; --lavender-mid: #A598C4; --lavender-lane: #988AB7; --lavender-deep: #70608F;
+  --board-mat: #F4F4E9; --board-frame: #A9C2B7; --board-tile-line: rgba(32,60,57,.12);
+  --shadow: 0 1px 0 rgba(32,60,57,.06), 0 8px 28px -14px rgba(32,60,57,.28);
+  --f-display: "Noto Sans SC", "Noto Sans", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --f-body: "Noto Sans SC", "Noto Sans", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --f-latin: "Noto Sans", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --mat: #15201D; --plate: #1C2A26; --ink: #E4EEE9; --ink-2: #B3C5BF; --ink-3: #82978F; --rule: #2E413B;
+  --teal: #5FB8A9; --teal-ink: #0E1B18; --felt: #3F5E58; --glow: #5E5530;
+  --board-mat: #EDEEE2; --board-frame: #8FAA9E; --board-tile-line: rgba(32,60,57,.14);
+  --shadow: 0 1px 0 rgba(0,0,0,.3), 0 10px 30px -16px rgba(0,0,0,.7);
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --mat: #15201D; --plate: #1C2A26; --ink: #E4EEE9; --ink-2: #B3C5BF; --ink-3: #82978F; --rule: #2E413B;
+  --teal: #5FB8A9; --teal-ink: #0E1B18; --felt: #3F5E58; --glow: #5E5530;
+  --board-mat: #EDEEE2; --board-frame: #8FAA9E; --board-tile-line: rgba(32,60,57,.14);
+  --shadow: 0 1px 0 rgba(0,0,0,.3), 0 10px 30px -16px rgba(0,0,0,.7);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--mat); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.7; }
+.page { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 80px; display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 48px; }
+@media (max-width: 900px) { .page { grid-template-columns: minmax(0, 1fr); gap: 0; } .rail { display: none; } }
+.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: grid; gap: 4px; font-size: 14px; }
+.rail .brand { font-weight: 900; font-size: 15px; letter-spacing: .02em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.rail a { color: var(--ink-2); text-decoration: none; padding: 5px 10px; border-radius: 8px; display: flex; gap: 10px; align-items: baseline; }
+.rail a span { font-family: var(--f-mono); font-size: 11px; color: var(--ink-3); }
+.rail a:hover, .rail a:focus-visible { background: var(--plate); color: var(--ink); outline: none; }
+main { min-width: 0; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.25; }
+h2 { font-size: clamp(24px, 3vw, 32px); font-weight: 900; letter-spacing: -.01em; }
+h3 { font-size: 18px; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); }
+.lead { font-size: 18px; color: var(--ink-2); }
+.muted { color: var(--ink-3); font-size: 14px; }
+section { display: grid; gap: 22px; scroll-margin-top: 24px; }
+.head { display: grid; gap: 8px; }
+figure { margin: 0; display: grid; gap: 8px; }
+figcaption { font-size: 13px; color: var(--ink-3); }
+img { display: block; max-width: 100%; height: auto; border-radius: 14px; }
+.plate { background: var(--plate); border-radius: 18px; box-shadow: var(--shadow); padding: 22px; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+/* hero */
+.hero { display: grid; gap: 24px; }
+.hero h1 { font-size: clamp(40px, 7vw, 76px); font-weight: 900; letter-spacing: -.02em; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; }
+.hero h1 small { font-family: var(--f-latin); font-weight: 600; font-size: .42em; color: var(--ink-3); letter-spacing: 0; }
+.fleetbar { display: flex; gap: 6px; }
+.fleetbar i { width: 28px; height: 8px; border-radius: 4px; display: block; }
+.specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; background: var(--rule); border-radius: 14px; overflow: hidden; }
+.specs div { background: var(--plate); padding: 14px 16px; display: grid; gap: 2px; }
+.specs b { font-size: 12px; color: var(--ink-3); font-weight: 500; letter-spacing: .04em; }
+.specs span { font-weight: 700; font-size: 15px; }
+.room { position: relative; }
+.room img { border-radius: 20px; width: 100%; }
+.tag { position: absolute; background: var(--plate); color: var(--ink); font-size: 12px; padding: 4px 10px; border-radius: 999px; box-shadow: var(--shadow); white-space: nowrap; }
+
+/* before / after */
+.changes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .changes { grid-template-columns: minmax(0, 1fr); } }
+.change { display: grid; gap: 8px; align-content: start; }
+.change .num { font-family: var(--f-mono); font-size: 12px; color: var(--teal); }
+.compare { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+@media (max-width: 760px) { .compare { grid-template-columns: minmax(0, 1fr); } }
+
+/* board */
+.board-wrap { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 980px) { .board-wrap { grid-template-columns: minmax(0, 1fr); } }
+.board-box { background: var(--plate); border-radius: 20px; padding: 14px; box-shadow: var(--shadow); }
+#board { width: 100%; height: auto; display: block; touch-action: manipulation; }
+#board .cell { cursor: pointer; }
+#board .cell:hover rect, #board .cell:focus rect { stroke: var(--ink); stroke-width: 2; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: inherit; font-size: 14px; border: 1px solid var(--rule); background: var(--plate); color: var(--ink); padding: 6px 14px 6px 10px; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.chip i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--mat); border-color: var(--ink); }
+.chip:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.readout { font-family: var(--f-mono); font-size: 13px; background: var(--mat); border-radius: 12px; padding: 12px 14px; min-height: 64px; color: var(--ink-2); white-space: pre-wrap; }
+.rules { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: r; }
+.rules li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; counter-increment: r; }
+.rules li::before { content: counter(r); font-family: var(--f-mono); font-weight: 600; color: var(--teal); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+
+/* spatial */
+.split { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 860px) { .split { grid-template-columns: minmax(0, 1fr); } }
+.diagram { overflow-x: auto; }
+.diagram svg { width: 100%; min-width: 520px; height: auto; display: block; }
+.diagram text { font-family: var(--f-mono); font-size: 11px; fill: var(--ink-2); }
+.facts { display: grid; gap: 12px; margin: 0; }
+.facts div { display: grid; grid-template-columns: 9em minmax(0, 1fr); gap: 12px; border-top: 1px solid var(--rule); padding-top: 10px; }
+.facts dt { color: var(--ink-3); font-size: 14px; }
+.facts dd { margin: 0; }
+
+/* dice */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 760px) { .steps { grid-template-columns: minmax(0, 1fr); } }
+.step { display: grid; gap: 6px; align-content: start; border-top: 3px solid var(--teal); padding-top: 12px; }
+.step .k { font-family: var(--f-mono); font-size: 12px; color: var(--ink-3); }
+.dice-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 700px) { .dice-row { grid-template-columns: minmax(0, 1fr); } }
+
+/* motion table */
+.table { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 14px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 500; color: var(--ink-3); font-size: 12px; letter-spacing: .04em; }
+td.n { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* window gallery */
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
+.gallery img { background: var(--plate); }
+.gallery figcaption b { color: var(--ink); font-weight: 700; font-size: 14px; display: block; }
+
+/* tokens */
+.swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 700px) { .swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.fleet { display: grid; gap: 6px; }
+.fleet h3 { font-size: 15px; }
+.ramp { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-radius: 10px; overflow: hidden; height: 56px; }
+.ramp i { display: block; }
+.ramp-l { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); font-family: var(--f-mono); font-size: 10px; color: var(--ink-3); }
+.roles { display: flex; flex-wrap: wrap; gap: 10px; }
+.role { display: flex; align-items: center; gap: 10px; background: var(--plate); border-radius: 12px; padding: 8px 14px 8px 8px; box-shadow: var(--shadow); font-size: 13px; }
+.role i { width: 32px; height: 32px; border-radius: 8px; display: block; border: 1px solid var(--rule); }
+.role b { display: block; font-weight: 600; }
+.role span { font-family: var(--f-mono); font-size: 11px; color: var(--ink-3); }
+
+/* status */
+.status { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.status .plate { display: grid; gap: 6px; align-content: start; }
+.status .big { font-family: var(--f-latin); font-weight: 800; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.pill { display: inline-block; font-size: 12px; padding: 2px 10px; border-radius: 999px; background: var(--mat); color: var(--ink-2); border: 1px solid var(--rule); }
+.ok { color: var(--teal); }
+ul.plain { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; max-width: 72ch; }
+video { width: 100%; border-radius: 16px; background: #000; display: block; max-width: 100%; }
+@media (prefers-reduced-motion: no-preference) { #board .route-num { transition: opacity .2s; } }
+</style>
+
+<div class="page">
+  <nav class="rail" aria-label="章节">
+    <div class="brand"><span class="fleetbar" aria-hidden="true"><i style="background:var(--mint-mid);width:10px"></i><i style="background:var(--sky-mid);width:10px"></i><i style="background:var(--apricot-mid);width:10px"></i><i style="background:var(--lavender-mid);width:10px"></i></span>云间航线</div>
+    <a href="#overview"><span>00</span>概览</a>
+    <a href="#changes"><span>01</span>相对 V4 的改动</a>
+    <a href="#space"><span>02</span>空间布局</a>
+    <a href="#board-sec"><span>03</span>棋盘与规则</a>
+    <a href="#dice"><span>04</span>3D 骰子</a>
+    <a href="#motion"><span>05</span>飞机与动效</a>
+    <a href="#window"><span>06</span>控制窗</a>
+    <a href="#tokens"><span>07</span>视觉规范</a>
+    <a href="#status"><span>08</span>验证与待办</a>
+  </nav>
+
+  <main>
+    <!-- 00 -->
+    <section class="hero" id="overview">
+      <div class="head">
+        <div class="eyebrow">PICO OS 6 · Shared Space · 设计 v5（已实现）</div>
+        <h1>云间航线 <small>Cloud Air</small></h1>
+        <p class="lead">把一张飞行棋毯放在你面前的桌上。捏一下骰子，看它在骰盘里翻滚落定，飞机一格一格跳过去，落到本色格再连跳，踩中虚线格就横穿对面航道飞过去。</p>
+      </div>
+      <div class="room">
+        <img src="img/room.jpg" alt="模拟器里的整体场景：左边是倾斜的 3D 棋台和骰盘，右边是玻璃材质的控制窗" width="1400" height="598">
+        <span class="tag" style="left:14%;top:6%">云港棋台 · Volumetric</span>
+        <span class="tag" style="left:16%;bottom:24%">骰盘 · 捏这里投掷</span>
+        <span class="tag" style="right:6%;top:4%">控制窗 · Planar</span>
+      </div>
+      <div class="specs">
+        <div><b>容器</b><span>Volumetric 棋台 + Planar 控制窗</span></div>
+        <div><b>棋台体积</b><span class="mono">0.78 × 0.50 × 1.00 m</span></div>
+        <div><b>控制窗</b><span class="mono">560 × 400 dp</span></div>
+        <div><b>席位</b><span>2–4 席 · 真人 / AI 轻松 / AI 聪明</span></div>
+        <div><b>技术栈</b><span>Spatial SDK 6.1.9 · SpatialUI · Noto Sans</span></div>
+        <div><b>语言</b><span>中文 / English，局内可切</span></div>
+      </div>
+    </section>
+
+    <!-- 01 -->
+    <section id="changes">
+      <div class="head">
+        <div class="eyebrow">01 · 从 Codex V4 到 v5</div>
+        <h2>保留调性，换掉三件事</h2>
+        <p>V4 的定位、四色低饱和配色、席位与 AI、中英、暂停与六点二选一都保留。改动集中在让它更像一盘真的飞行棋。</p>
+      </div>
+      <div class="changes">
+        <div class="change plate"><span class="num">改动 1</span><h3>棋盘回到经典棋毯</h3><p class="muted">四角机库、十字四臂、52 格环道、四色循环格、6 格归航道。V4 的"中性环道 + 10→22 高架桥"换成本色连跳和虚线飞越，跳和飞才是这类游戏的乐趣。</p></div>
+        <div class="change plate"><span class="num">改动 2</span><h3>骰子是棋台上的实物</h3><p class="muted">Blender 骰子放在棋毯前方的毛毡骰盘里，捏骰子或骰盘就投。物理轨迹本地算出，先定点数再放动画，不在末帧偷翻面。</p></div>
+        <div class="change plate"><span class="num">改动 3</span><h3>飞机是真模型，会跳会飞</h3><p class="muted">Blender 低多边形飞机按机队上漆。逐格起落、爬升抬头、转弯压坡，飞越时横滚一周，被击退时转一圈飞回机库。</p></div>
+      </div>
+      <div class="compare">
+        <figure><img src="img/v4-board.jpg" alt="Codex V4 的 Figma 画板：十字棋盘与高架捷径" loading="lazy" width="1200" height="786"><figcaption>Codex V4（Figma 导出）· 中性环道与高架捷径</figcaption></figure>
+        <figure><img src="img/mat.jpg" alt="参考的儿童飞行棋毯照片" loading="lazy" width="700" height="700"><figcaption>参考：经典飞行棋毯</figcaption></figure>
+        <figure><img src="img/board-newgame.jpg" alt="v5 棋台开局截图：四角机库停着四队飞机，前方是深色骰盘" loading="lazy" width="1040" height="620"><figcaption>v5 · 模拟器开局</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- 02 -->
+    <section id="space">
+      <div class="head">
+        <div class="eyebrow">02 · 空间布局</div>
+        <h2>像画架一样朝你倾斜的棋台</h2>
+        <p>整块棋台绕横轴向用户倾斜 28°，最低点（骰盘前沿）贴着体积底面，坐着也能看清远端两个机库。控制窗由系统摆在棋台右侧。</p>
+      </div>
+      <div class="split">
+        <div class="plate diagram">
+          <svg viewBox="0 0 560 300" role="img" aria-label="侧视图：体积 1.0 米深 0.5 米高，棋台倾斜 28 度，骰盘在最前方贴近底面">
+            <rect x="60" y="40" width="400" height="200" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="5 5" style="color:var(--ink-3)"/>
+            <text x="60" y="30">体积 Volumetric 0.5 m 高</text>
+            <text x="370" y="262">1.0 m 深 →</text>
+            <!-- board: centre (260, 132), half 0.36 m → 144 px at 400 px/m, tilt 28° -->
+            <line x1="132.8" y1="64.4" x2="387.2" y2="199.6" stroke="#A9C2B7" stroke-width="10" stroke-linecap="round"/>
+            <line x1="134" y1="60" x2="386" y2="194" stroke="#F4F4E9" stroke-width="6" stroke-linecap="round"/>
+            <!-- tray -->
+            <g transform="translate(412 214) rotate(28)">
+              <rect x="-26" y="-12" width="52" height="14" rx="3" fill="#DCE6DF"/>
+              <rect x="-22" y="-6" width="44" height="6" fill="#3F5E58"/>
+              <rect x="-6" y="-14" width="10" height="10" rx="2" fill="#F4F4E9" stroke="#203C39" stroke-opacity=".3"/>
+            </g>
+            <!-- planes -->
+            <path d="M190 88 l16 -4 l-2 6 z" fill="#5B9F8B"/>
+            <path d="M300 146 l16 -4 l-2 6 z" fill="#BB8C67"/>
+            <!-- tilt arc -->
+            <path d="M260 132 h70" stroke="var(--ink-3)" stroke-dasharray="3 3"/>
+            <path d="M318 132 A58 58 0 0 1 311 159" fill="none" stroke="var(--teal)" stroke-width="2"/>
+            <text x="324" y="152" style="fill:var(--teal)">28°</text>
+            <!-- eye -->
+            <circle cx="530" cy="70" r="7" fill="none" stroke="var(--ink)" stroke-width="2"/>
+            <circle cx="530" cy="70" r="2.5" fill="var(--ink)"/>
+            <line x1="522" y1="72" x2="140" y2="64" stroke="var(--teal)" stroke-opacity=".5" stroke-dasharray="2 4"/>
+            <line x1="522" y1="74" x2="410" y2="208" stroke="var(--teal)" stroke-opacity=".5" stroke-dasharray="2 4"/>
+            <text x="488" y="98">用户</text>
+            <text x="120" y="118">远端机库</text>
+            <text x="392" y="246">骰盘贴底面</text>
+          </svg>
+        </div>
+        <dl class="facts">
+          <div><dt>棋毯</dt><dd><span class="mono">0.72 m</span> 见方，外加 12 mm 鼠尾草色包边。15 × 15 网格，格距 <span class="mono">48 mm</span>。</dd></div>
+          <div><dt>倾斜</dt><dd><span class="mono">28°</span>。第一版 22° 时远端机库被压扁到约 40%，评审后加大。</dd></div>
+          <div><dt>骰盘</dt><dd>在棋毯前缘外侧，骰子边长 <span class="mono">42 mm</span>。深色毛毡底让象牙色骰子跳出来。</dd></div>
+          <div><dt>边界</dt><dd>稳定状态下所有物件完整在体积内，避免边界裁剪的性能开销。实测包围盒 <span class="mono">x ±0.372 m</span>。</dd></div>
+          <div><dt>控制窗</dt><dd><span class="mono">Placement.right(棋台)</span>，玻璃底，最小 520 × 320 dp。</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section id="board-sec">
+      <div class="head">
+        <div class="eyebrow">03 · 棋盘与规则</div>
+        <h2>可交互棋盘（与 App 同一套几何）</h2>
+        <p>下面的棋盘由 App 里的 <span class="mono">Board</span> 坐标算法直接生成。选一支机队看它的完整航线，鼠标悬停或点一格看它对每支机队是第几格。</p>
+      </div>
+      <div class="board-wrap">
+        <div class="board-box">
+          <svg id="board" viewBox="0 0 640 640" role="img" aria-label="飞行棋棋盘俯视图"></svg>
+        </div>
+        <div style="display:grid;gap:18px;align-content:start;min-width:0">
+          <div class="controls" role="group" aria-label="显示哪支机队的航线">
+            <button class="chip" id="f-none" aria-pressed="true" type="button">不显示航线</button>
+            <button class="chip" id="f-0" aria-pressed="false" type="button"><i style="background:var(--mint-mid)"></i>薄荷</button>
+            <button class="chip" id="f-1" aria-pressed="false" type="button"><i style="background:var(--sky-mid)"></i>天空蓝</button>
+            <button class="chip" id="f-2" aria-pressed="false" type="button"><i style="background:var(--apricot-mid)"></i>杏色</button>
+            <button class="chip" id="f-3" aria-pressed="false" type="button"><i style="background:var(--lavender-mid)"></i>薰衣草</button>
+          </div>
+          <div class="readout" id="readout" aria-live="polite">悬停或点一格查看。</div>
+          <div class="legend">
+            <span><i style="background:var(--mint-mid)"></i>环道格（四色循环）</span>
+            <span><i style="background:var(--mint-lane)"></i>归航道（更深一档）</span>
+            <span><i style="border:3px solid var(--mint-deep)"></i>飞越入口</span>
+            <span><i style="background:var(--glow)"></i>航线编号</span>
+          </div>
+          <ol class="rules">
+            <li><span>掷出 6 才能出机，飞机停在起飞格（带箭头），不额外前进。任何 6 都再投一次。</span></li>
+            <li><span>落到本色格，向前连跳 4 格（一次动作只跳一次）。</span></li>
+            <li><span>落到本色的环形标记格（第 20 格），沿虚线横穿对面臂飞到第 28 格，再连跳到 32。连跳落到第 20 格也会触发。</span></li>
+            <li><span>飞越穿过对面机队归航道的第 3 格，停在那里的飞机被送回机库。</span></li>
+            <li><span>最终落点上的对手飞机全部回机库；自己的飞机可以叠放；归航道不与他色相撞。</span></li>
+            <li><span>进中心要精确点数，多出的步数退回。四机先归航者胜。</span></li>
+            <li><span>6 点且"出机/前进"都合法时让玩家二选一；手动模式下再选具体飞机；全自动模式跳过选择。</span></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 -->
+    <section id="dice">
+      <div class="head">
+        <div class="eyebrow">04 · 3D 骰子</div>
+        <h2>捏一下就投，结果先定好</h2>
+        <p>可以投的时候，骰子轻轻上下浮动，下面有一圈当前机队色的光环。注视骰子或骰盘捏合即投；控制窗的"投掷骰子"按钮是同样的入口。</p>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="k">STEP 1</span><h3>先提交点数</h3><p class="muted">游戏逻辑先公平地掷出 1–6 并写进存档。进程中途被杀，下次继续会重放同一个点数，不能借机重掷。</p></div>
+        <div class="step"><span class="k">STEP 2</span><h3>模拟一次真实投掷</h3><p class="muted"><span class="mono">240 Hz</span> 刚体求解：重力、顶点与围边接触、反弹、摩擦、静止判定。与结果无关，同一种子永远同一条轨迹。</p></div>
+        <div class="step"><span class="k">STEP 3</span><h3>按立方体对称换面</h3><p class="muted">整条轨迹从第一帧起乘同一个对称旋转，让自然落定的朝上面正好是提交的点数。落定后骰子放大一下（1 → 1.12 → 1）再交给棋盘。</p></div>
+      </div>
+      <div class="dice-row">
+        <figure><img src="img/die-tumble.jpg" alt="骰子在骰盘上方翻滚的瞬间" loading="lazy" width="480" height="320"><figcaption>投掷中：骰子在骰盘上方翻滚</figcaption></figure>
+        <figure><img src="img/tray.jpg" alt="静止的骰子，下方有薄荷色邀请光环" loading="lazy" width="310" height="180"><figcaption>等待投掷：光环取当前机队色</figcaption></figure>
+      </div>
+      <p class="muted">骰点约定沿用 Blender 模型：1 在 −Z、6 在 +Z、2/5 在 ±X、3/4 在 ±Y。单元测试覆盖 40 个种子 × 6 个结果全部落定且朝上面正确。</p>
+    </section>
+
+    <!-- 05 -->
+    <section id="motion">
+      <div class="head">
+        <div class="eyebrow">05 · 飞机与动效</div>
+        <h2>一格一跳，数得清走了几步</h2>
+        <p>动效全部在 ECS 系统里逐帧驱动，不经过 Compose。设置里可选舒缓（×1.25）、标准、轻快（×0.65）；减少动态时飞机直接滑到落点，骰子直接显示结果。</p>
+      </div>
+      <figure><video src="media/demo.mp4" poster="img/board-flyover.jpg" controls muted playsinline preload="none"></video><figcaption>模拟器录屏 46 秒：飞越并击退两架杏色飞机 → 对手无路可走 → 6 点二选一 → 起飞 → 归航到塔台</figcaption></figure>
+      <div class="table plate" style="padding:6px 10px">
+        <table>
+          <thead><tr><th>动作</th><th>时长（标准档）</th><th>路径</th><th>细节</th></tr></thead>
+          <tbody>
+            <tr><td>起飞</td><td class="n">0.80 s</td><td>机库 → 起飞格，弧高 4 cm</td><td>ease-out，起飞音</td></tr>
+            <tr><td>走格</td><td class="n">0.17 s + 0.12 s ÷ n / 格</td><td>每格一跳，弧高 1.2 cm</td><td>爬升抬头 ±14°，转弯压坡 ≤15°</td></tr>
+            <tr><td>连跳</td><td class="n">0.55 s</td><td>一条弧，弧高 5 cm</td><td>起跳的格子和落点格抬起发光</td></tr>
+            <tr><td>飞越</td><td class="n">1.10 s</td><td>横穿对面臂，弧高 9 cm</td><td>中段 360° 横滚；本队回合时弧线上浮 5 颗引导珠</td></tr>
+            <tr><td>击退</td><td class="n">0.80 s</td><td>沿弧线回机库，弧高 6 cm</td><td>攻方落地后 0.1 s 开始，自转一周</td></tr>
+            <tr><td>归航</td><td class="n">逐格 + 0.45 s + 0.40 s</td><td>最后一跳 4 cm 落到塔台旁</td><td>原地自转一周，归航音；第 3、4 架叠在前两架上</td></tr>
+            <tr><td>回合切换</td><td class="n">≈ 0.24 s</td><td>当前机队的机库围边变深并抬起 3 mm</td><td>塔台信标与骰子光环换成该队颜色</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="split">
+        <figure><img src="img/board-flyover.jpg" alt="飞越中途截图：薄荷飞机压坡飞过下方航道，被击退的杏色飞机飞回机库" loading="lazy" width="1040" height="620"><figcaption>飞越中途：路线格抬起发光，被击退的杏色飞机飞回机库</figcaption></figure>
+        <figure><img src="img/assets.jpg" alt="Blender 渲染的骰子和飞机模型" loading="lazy" width="1000" height="700"><figcaption>Blender 资产（Codex V4）：飞机 4 部件、骰子 21 个实体点；机身材质在 App 里按机队替换</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section id="window">
+      <div class="head">
+        <div class="eyebrow">06 · 控制窗</div>
+        <h2>一次只给一个主动作</h2>
+        <p>全部用 SpatialUI 组件和 PicoTheme 角色色，系统玻璃做底。顶部是当前机队的回合药丸，底部是四支机队的飞机点阵（空心在机库、浅色在途、深色已归航）。</p>
+      </div>
+      <div class="gallery">
+        <figure><img src="img/w-home.jpg" alt="首页：继续航程、开始新航程、设置、玩法说明" loading="lazy" width="585" height="427"><figcaption><b>首页</b>有存档时"继续航程"是主按钮</figcaption></figure>
+        <figure><img src="img/w-setup.jpg" alt="开局设置：席位数 2/3/4，每席真人或 AI" loading="lazy" width="540" height="405"><figcaption><b>准备起飞</b>2–4 席，每席真人 / AI 轻松 / AI 聪明</figcaption></figure>
+        <figure><img src="img/w-turn.jpg" alt="回合页：轮到你了，投掷骰子按钮，机队点阵" loading="lazy" width="820" height="580"><figcaption><b>回合</b>未投时骰面显示淡色占位</figcaption></figure>
+        <figure><img src="img/w-six.jpg" alt="6 点二选一：出动新飞机或前进 6 步" loading="lazy" width="820" height="580"><figcaption><b>6 点二选一</b>出动新飞机 / 前进 6 步</figcaption></figure>
+        <figure><img src="img/w-pick.jpg" alt="手动选机列表，推荐的飞机高亮" loading="lazy" width="820" height="580"><figcaption><b>手动选机</b>推荐项高亮；也可直接捏棋台上带光环的飞机</figcaption></figure>
+        <figure><img src="img/w-pause.jpg" alt="暂停菜单" loading="lazy" width="563" height="405"><figcaption><b>航程已暂停</b>暂停时空中的骰子结果会等到继续再结算</figcaption></figure>
+        <figure><img src="img/w-settings.jpg" alt="设置：语言、游玩方式、动效速度" loading="lazy" width="563" height="360"><figcaption><b>设置</b>语言、游玩方式、动效速度、声音、减少动态</figcaption></figure>
+        <figure><img src="img/w-victory.jpg" alt="胜利页：薄荷获胜，再来一局" loading="lazy" width="549" height="338"><figcaption><b>胜利</b>再来一局沿用本局席位</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- 07 -->
+    <section id="tokens">
+      <div class="head">
+        <div class="eyebrow">07 · 视觉规范</div>
+        <h2>四色从浅到深一条色阶</h2>
+        <p>每支机队一条五级色阶，按用途取不同深度。界面字体统一 Noto Sans（中文回退系统 CJK）。</p>
+      </div>
+      <div class="swatches" id="swatches"></div>
+      <p class="muted">色阶从左到右：机库底板（原色）· 环道格（混 40%）· 归航道（55%）· 机身漆（60%）· 箭头 / 围边 / 塔台花瓣（深色）。</p>
+      <div class="roles">
+        <div class="role"><i style="background:#246F66"></i><div><b>interaction</b><span>#246F66 · 主按钮</span></div></div>
+        <div class="role"><i style="background:#428C71"></i><div><b>passable</b><span>#428C71 · 胜利、归航</span></div></div>
+        <div class="role"><i style="background:#AD7A36"></i><div><b>alert</b><span>#AD7A36 · 未保存提示</span></div></div>
+        <div class="role"><i style="background:#AF514D"></i><div><b>error</b><span>#AF514D</span></div></div>
+        <div class="role"><i style="background:#F4F4E9"></i><div><b>棋毯象牙</b><span>#F4F4E9</span></div></div>
+        <div class="role"><i style="background:#A9C2B7"></i><div><b>棋毯包边</b><span>#A9C2B7</span></div></div>
+        <div class="role"><i style="background:#3F5E58"></i><div><b>骰盘毛毡</b><span>#3F5E58</span></div></div>
+        <div class="role"><i style="background:#FFF1C7"></i><div><b>路线高亮</b><span>#FFF1C7 · 并抬起 3 mm</span></div></div>
+      </div>
+    </section>
+
+    <!-- 08 -->
+    <section id="status">
+      <div class="head">
+        <div class="eyebrow">08 · 验证与待办</div>
+        <h2>模拟器上的五轮迭代</h2>
+        <p>设计评审 2 轮、真实注入输入的 QA 2 轮，每轮的问题都修完并复验。以下数字来自最后一次构建。</p>
+      </div>
+      <div class="status">
+        <div class="plate"><span class="big ok">49</span><span>单元测试全部通过</span><span class="muted">规则、骰子求解、存档、回合流、两个 ViewModel</span></div>
+        <div class="plate"><span class="big ok">8 / 8</span><span>插件机器门禁 clean</span><span class="muted">含架构检查、design-style 0 错、模拟器安装启动</span></div>
+        <div class="plate"><span class="big">2</span><span>整局自动对战无故障</span><span class="muted">4 席 899 s、2 席 294 s 打到胜利，0 次超时兜底，0 崩溃</span></div>
+        <div class="plate"><span class="big">0</span><span>未关闭的 S1–S3 问题</span><span class="muted">QA 第 1 轮的存档恢复 S1 已修并复验</span></div>
+      </div>
+      <div class="plate" style="display:grid;gap:10px">
+        <h3>还没验证 / 已知问题</h3>
+        <ul class="plain">
+          <li>控制窗开局时有约三分之一在模拟器视野外。位置由系统 <span class="mono">Placement.right</span> 决定，需要在头显上确认。</li>
+          <li>没有上过真机：物理尺寸舒适度、手部与手柄交互、帧率都只在模拟器上看过。</li>
+          <li>模拟器帧率低，走格时长比设计值略长（4 格 0.90 s，设计 0.80 s）。</li>
+        </ul>
+        <p class="muted">项目目录 <span class="mono">Downloads\cloud-air</span>，包名 <span class="mono">io.embodit.cloudair</span>。设计合同、评审和 QA 报告都在仓库的 design/ 与 docs/ 下。</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  // Board geometry: the same algorithm as domain/model/Board.kt.
+  var SIZE = 15, Q = 13;
+  var TEAM = [
+    { name: "薄荷", key: "mint" }, { name: "天空蓝", key: "sky" },
+    { name: "杏色", key: "apricot" }, { name: "薰衣草", key: "lavender" }
+  ];
+  var COL = {
+    mint: ["#A8DCCB", "#74B3A1", "#61A491", "#5B9F8B", "#277661"],
+    sky: ["#A9D3F2", "#7CABCF", "#6B9BC2", "#6596BE", "#386E9B"],
+    apricot: ["#F6C9A8", "#CEA17C", "#C0916C", "#BB8C67", "#93643B"],
+    lavender: ["#C9BDE8", "#A598C4", "#988AB7", "#9485B3", "#70608F"]
+  };
+  var quarter = [[1,6],[2,6],[3,6],[4,6],[5,6],[6,5],[6,4],[6,3],[6,2],[6,1],[6,0],[7,0],[8,0]];
+  function rot(p, q) { var r = p[0], c = p[1]; for (var i = 0; i < ((q % 4) + 4) % 4; i++) { var nr = SIZE - 1 - c, nc = r; r = nr; c = nc; } return [r, c]; }
+  var loop = [];
+  for (var t = 0; t < 4; t++) for (var k = 0; k < Q; k++) loop.push(rot(quarter[k], t));
+  var notch = [5, 18, 31, 44];
+  function abs(team, p) { return (team * Q + p) % 52; }
+  function cellOf(team, p) { return p <= 50 ? loop[abs(team, p)] : (p <= 56 ? rot([1 + (p - 51), 7], team) : [7, 7]); }
+  function progressOn(team, i) { var p = ((i - team * Q) % 52 + 52) % 52; return p <= 50 ? p : null; }
+
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.getElementById("board");
+  var PAD = 20, C = 40;
+  function X(c) { return PAD + c * C + C / 2; }
+  function Y(r) { return PAD + r * C + C / 2; }
+  function el(name, attrs, parent) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); (parent || svg).appendChild(e); return e; }
+
+  el("rect", { x: 4, y: 4, width: 632, height: 632, rx: 22, fill: "#A9C2B7" });
+  el("rect", { x: 12, y: 12, width: 616, height: 616, rx: 16, fill: "#F4F4E9" });
+
+  // Hangars
+  for (var h = 0; h < 4; h++) {
+    var hc = rot([2.5, 2.5], h), s = 4.6 * C, col = COL[TEAM[h].key];
+    el("rect", { x: X(hc[1]) - s / 2, y: Y(hc[0]) - s / 2, width: s, height: s, rx: 14, fill: col[0], stroke: col[1], "stroke-width": 6 });
+    for (var sp = 0; sp < 4; sp++) {
+      var sr = 2.5 + (sp < 2 ? -1 : 1), sc = 2.5 + (sp % 2 === 0 ? -1 : 1), p = rot([sr, sc], h);
+      el("circle", { cx: X(p[1]), cy: Y(p[0]), r: C * 0.62, fill: "#FBFBF6" });
+      plane(X(p[1]), Y(p[0]), col[3], h);
+    }
+  }
+  function plane(x, y, color, team) {
+    // A small top-view plane glyph pointing toward the board centre.
+    var ang = [135, 225, 315, 45][team];
+    var g = el("g", { transform: "translate(" + x + " " + y + ") rotate(" + ang + ")" });
+    el("path", { d: "M0 -13 C3 -13 3.5 -8 3.5 -4 L15 3 L15 6.5 L3.5 3 L3 9 L7 12 L7 14 L0 12.5 L-7 14 L-7 12 L-3 9 L-3.5 3 L-15 6.5 L-15 3 L-3.5 -4 C-3.5 -8 -3 -13 0 -13 Z", fill: color, stroke: "rgba(32,60,57,.35)", "stroke-width": 0.8 }, g);
+  }
+
+  // Lanes
+  var laneEls = [];
+  for (var lt = 0; lt < 4; lt++) {
+    for (var li = 0; li < 6; li++) {
+      var lc = rot([1 + li, 7], lt);
+      var g = el("g", { class: "cell", tabindex: 0, "data-lane": lt + ":" + li });
+      el("rect", { x: X(lc[1]) - 16.5, y: Y(lc[0]) - 16.5, width: 33, height: 33, rx: 7, fill: COL[TEAM[lt].key][2] }, g);
+      el("circle", { cx: X(lc[1]), cy: Y(lc[0]), r: 7, fill: "#FBFBF6" }, g);
+      laneEls.push(g);
+    }
+  }
+  // Centre: petals and hub
+  for (var pt = 0; pt < 4; pt++) {
+    var pc = rot([6.35, 7], pt);
+    el("rect", { x: X(pc[1]) - 15, y: Y(pc[0]) - 15, width: 30, height: 30, rx: 4, fill: COL[TEAM[pt].key][4], transform: "rotate(45 " + X(pc[1]) + " " + Y(pc[0]) + ")" });
+  }
+  el("circle", { cx: X(7), cy: Y(7), r: 17, fill: "#FBFBF6", stroke: "#A9C2B7", "stroke-width": 3 });
+  el("circle", { cx: X(7), cy: Y(7), r: 6, fill: "#A9C2B7" });
+
+  // Loop tiles
+  var tileEls = [];
+  loop.forEach(function (cell, i) {
+    var team = i % 4, col = COL[TEAM[team].key], x = X(cell[1]), y = Y(cell[0]);
+    var g = el("g", { class: "cell", tabindex: 0, "data-i": i });
+    var r = el("rect", { x: x - 16.5, y: y - 16.5, width: 33, height: 33, rx: 7, fill: col[1] }, g);
+    if (notch.indexOf(i) >= 0) { r.setAttribute("width", 26); r.setAttribute("height", 26); r.setAttribute("x", x - 13); r.setAttribute("y", y - 13); r.setAttribute("transform", "rotate(45 " + x + " " + y + ")"); }
+    el("circle", { cx: x, cy: y, r: 6, fill: "#FBFBF6" }, g);
+    tileEls.push(g);
+  });
+  // Launch arrows, fly-over dashes and entry rings
+  for (var at = 0; at < 4; at++) {
+    var a = cellOf(at, 0), b = cellOf(at, 1), deep = COL[TEAM[at].key][4];
+    var ang = Math.atan2(Y(b[0]) - Y(a[0]), X(b[1]) - X(a[1])) * 180 / Math.PI;
+    var ag = el("g", { transform: "translate(" + X(a[1]) + " " + Y(a[0]) + ") rotate(" + ang + ")", "pointer-events": "none" });
+    el("path", { d: "M-10 0 H8 M2 -6 L9 0 L2 6", stroke: deep, "stroke-width": 4, fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round" }, ag);
+    var f = cellOf(at, 20), to = cellOf(at, 28);
+    for (var d = 1; d <= 3; d++) {
+      var u = d / 4, dx = X(f[1]) + (X(to[1]) - X(f[1])) * u, dy = Y(f[0]) + (Y(to[0]) - Y(f[0])) * u;
+      var vertical = f[1] === to[1];
+      el("rect", { x: dx - (vertical ? 2.5 : 5), y: dy - (vertical ? 5 : 2.5), width: vertical ? 5 : 10, height: vertical ? 10 : 5, rx: 2, fill: deep, "pointer-events": "none" });
+    }
+    el("circle", { cx: X(f[1]), cy: Y(f[0]), r: 12, fill: "none", stroke: deep, "stroke-width": 3.5, "pointer-events": "none" });
+  }
+
+  // Route overlay
+  var overlay = el("g", { "pointer-events": "none" });
+  function clearOverlay() { while (overlay.firstChild) overlay.removeChild(overlay.firstChild); }
+  function showRoute(team) {
+    clearOverlay();
+    if (team === null) return;
+    var deep = COL[TEAM[team].key][4];
+    var pts = [];
+    for (var p = 0; p <= 57; p++) { var c = cellOf(team, p); pts.push(X(c[1]) + "," + Y(c[0])); }
+    el("polyline", { points: pts.join(" "), fill: "none", stroke: deep, "stroke-width": 3, "stroke-opacity": 0.45, "stroke-linejoin": "round" }, overlay);
+    for (var q = 0; q <= 56; q++) {
+      var cc = cellOf(team, q);
+      el("circle", { cx: X(cc[1]), cy: Y(cc[0]), r: 9.5, fill: "#FFF1C7", stroke: deep, "stroke-width": 1.2 }, overlay);
+      var tx = el("text", { x: X(cc[1]), y: Y(cc[0]) + 3.5, "text-anchor": "middle", "font-size": 9.5, "font-family": "JetBrains Mono, monospace", fill: "#203C39", "font-weight": 600 }, overlay);
+      tx.textContent = q;
+    }
+    // fly-over arc
+    var f = cellOf(team, 20), t2 = cellOf(team, 28), mx = (X(f[1]) + X(t2[1])) / 2, my = (Y(f[0]) + Y(t2[0])) / 2;
+    var nx = mx - X(7), ny = my - Y(7), len = Math.hypot(nx, ny) || 1;
+    el("path", { d: "M" + X(f[1]) + " " + Y(f[0]) + " Q " + (mx + nx / len * 60) + " " + (my + ny / len * 60) + " " + X(t2[1]) + " " + Y(t2[0]), fill: "none", stroke: deep, "stroke-width": 3, "stroke-dasharray": "6 5", "marker-end": "" }, overlay);
+    var hcen = rot([2.5, 2.5], team), l0 = cellOf(team, 0);
+    el("line", { x1: X(hcen[1]), y1: Y(hcen[0]), x2: X(l0[1]), y2: Y(l0[0]), stroke: deep, "stroke-width": 3, "stroke-dasharray": "2 5", "stroke-linecap": "round" }, overlay);
+  }
+
+  var readout = document.getElementById("readout");
+  function describeLoop(i) {
+    var color = TEAM[i % 4].name, lines = ["环道第 " + i + " 格（绝对编号），" + color + "格" + (notch.indexOf(i) >= 0 ? "，拐角菱形格" : "")];
+    for (var t = 0; t < 4; t++) {
+      var p = progressOn(t, i);
+      var tags = [];
+      if (p === 0) tags.push("起飞格");
+      if (p === 20) tags.push("飞越入口 → 28");
+      if (p === 28) tags.push("飞越落点");
+      if (p === 50) tags.push("归航道入口");
+      if (p !== null && p % 4 === 0 && t === i % 4 && p !== 0 && p !== 20) tags.push("连跳 +4");
+      lines.push(TEAM[t].name + "：" + (p === null ? "不经过（已进归航道）" : "第 " + p + " 格") + (tags.length ? " · " + tags.join(" · ") : ""));
+    }
+    return lines.join("\n");
+  }
+  tileEls.forEach(function (g, i) {
+    var show = function () { readout.textContent = describeLoop(i); };
+    g.addEventListener("mouseenter", show); g.addEventListener("focus", show); g.addEventListener("click", show);
+  });
+  laneEls.forEach(function (g) {
+    var parts = g.getAttribute("data-lane").split(":"), t = +parts[0], li = +parts[1];
+    var show = function () {
+      readout.textContent = TEAM[t].name + "归航道第 " + (li + 1) + " 格（进度 " + (51 + li) + "）" + (li === 2 ? "\n对面机队飞越时会穿过这一格，停在这里的飞机会被送回机库。" : "") + "\n其他机队不会进入这条航道。";
+    };
+    g.addEventListener("mouseenter", show); g.addEventListener("focus", show); g.addEventListener("click", show);
+  });
+
+  var buttons = ["f-none", "f-0", "f-1", "f-2", "f-3"].map(function (id) { return document.getElementById(id); });
+  function select(team) {
+    buttons.forEach(function (b, idx) { b.setAttribute("aria-pressed", String(team === null ? idx === 0 : idx === team + 1)); });
+    showRoute(team);
+    try { localStorage.setItem("cloudair-route", team === null ? "" : String(team)); } catch (e) {}
+  }
+  buttons.forEach(function (b, idx) { b.addEventListener("click", function () { select(idx === 0 ? null : idx - 1); }); });
+  var saved = null;
+  try { saved = localStorage.getItem("cloudair-route"); } catch (e) {}
+  select(saved === null ? 0 : (saved === "" ? null : +saved));
+  if (saved === null) readout.textContent = describeLoop(20);
+
+  // Swatches
+  var sw = document.getElementById("swatches");
+  var labels = ["原色", "40%", "55%", "60%", "深色"];
+  TEAM.forEach(function (tm) {
+    var d = document.createElement("div"); d.className = "fleet";
+    var h3 = document.createElement("h3"); h3.textContent = tm.name; d.appendChild(h3);
+    var ramp = document.createElement("div"); ramp.className = "ramp";
+    COL[tm.key].forEach(function (c) { var i = document.createElement("i"); i.style.background = c; i.title = c; ramp.appendChild(i); });
+    d.appendChild(ramp);
+    var l = document.createElement("div"); l.className = "ramp-l";
+    COL[tm.key].forEach(function (c) { var s = document.createElement("span"); s.textContent = c.slice(1); l.appendChild(s); });
+    d.appendChild(l);
+    sw.appendChild(d);
+  });
+})();
+</script>

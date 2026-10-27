@@ -1,0 +1,125 @@
+<resources>
+    <string name="app_name">云间航线</string>
+    <string name="app_tagline">把一段轻松航程，放在身边</string>
+
+    <string name="control_window_title">云间航线</string>
+    <string name="board_window_title">云港棋台</string>
+
+    <string name="home_hero">让一趟飞行，慢下来。</string>
+    <string name="home_copy">掷一颗骰子，看飞机起飞、连跳、飞越，平安归航。</string>
+    <string name="home_new">开始新航程</string>
+    <string name="home_continue">继续航程</string>
+    <string name="home_saved">%1$d 席 · 第 %2$d 回合 · 已保存</string>
+    <string name="home_broken_save">发现一份无法读取的航程</string>
+    <string name="home_context">本地轮流 · 2–4 席 · 可加入 AI</string>
+
+    <string name="common_settings">设置</string>
+    <string name="common_rules">玩法说明</string>
+    <string name="common_back">返回</string>
+    <string name="common_done">完成</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_menu">菜单</string>
+
+    <string name="setup_title">准备起飞</string>
+    <string name="setup_seats">席位</string>
+    <string name="setup_seat_count">%1$d 席</string>
+    <string name="setup_human">真人</string>
+    <string name="setup_ai_easy">AI · 轻松</string>
+    <string name="setup_ai_smart">AI · 聪明</string>
+    <string name="setup_human_required">至少保留一个真人席位</string>
+    <string name="setup_start">开始游戏</string>
+    <string name="setup_replace_title">开始一段新的航程？</string>
+    <string name="setup_replace_body">本设备已有一段保存的航程，开始新游戏会替换它。</string>
+    <string name="setup_replace_action">开始新航程</string>
+
+    <string name="team_mint">薄荷</string>
+    <string name="team_sky">天空蓝</string>
+    <string name="team_apricot">杏色</string>
+    <string name="team_lavender">薰衣草</string>
+    <string name="seat_label">%1$s机队</string>
+
+    <string name="turn_yours">轮到你了</string>
+    <string name="turn_ai">%1$s 正在思考…</string>
+    <string name="turn_other_human">轮到 %1$s</string>
+    <string name="turn_round">第 %1$d 回合</string>
+    <string name="turn_roll">投掷骰子</string>
+    <string name="turn_roll_hint">点棋台上的骰子，或按这里。</string>
+    <string name="turn_rolling">骰子滚动中…</string>
+    <string name="turn_moving">飞行中…</string>
+    <string name="turn_result">掷出了 %1$d</string>
+    <string name="turn_extra">掷出 6，再投一次</string>
+    <string name="turn_no_move">本次没有可移动的飞机</string>
+    <string name="turn_need_six">掷出 6 才能出动飞机</string>
+    <string name="turn_six_no_move">这次没有合法动作，但 6 点仍可再投</string>
+    <string name="turn_home_count">%1$d/4</string>
+    <string name="turn_unsaved">最新进度暂未保存</string>
+
+    <string name="choice_title">这次 6 点，如何起航？</string>
+    <string name="choice_launch">出动新飞机</string>
+    <string name="choice_advance">前进 6 步</string>
+    <string name="choice_launch_hint">6 点用于起飞，飞机停在起飞格</string>
+    <string name="choice_advance_hint">推荐一架在途飞机前进 6 格</string>
+    <string name="choice_launch_hint_manual">然后选一架机库里的飞机</string>
+    <string name="choice_advance_hint_manual">然后选一架在途飞机</string>
+    <string name="choice_plane">选择一架飞机</string>
+    <string name="choice_plane_number">飞机 %1$d</string>
+    <string name="choice_recommended">推荐</string>
+    <string name="choice_in_hangar">在机库</string>
+    <string name="choice_progress">第 %1$d 格 → 第 %2$d 格</string>
+    <string name="choice_progress_finish">第 %1$d 格 → 归航</string>
+    <string name="choice_back">返回选择动作</string>
+
+    <string name="event_launch">%1$s 的 %2$d 号机已起飞</string>
+    <string name="event_move">%1$s 的 %2$d 号机前进 %3$d 格</string>
+    <string name="event_jump">%1$s 的 %2$d 号机落在本色格，连跳向前</string>
+    <string name="event_fly">%1$s 的 %2$d 号机飞越了航道</string>
+    <string name="event_bounce">%1$s 的 %2$d 号机超过终点，退了回来</string>
+    <string name="event_capture">让 %1$d 架对手飞机回了机库</string>
+    <string name="event_home">%1$s 的 %2$d 号机平安归航</string>
+    <string name="event_pass">%1$s 本轮没有合法动作</string>
+
+    <string name="pause_title">航程已暂停</string>
+    <string name="pause_copy">休息一下，航程在这里等你。</string>
+    <string name="pause_resume">继续游戏</string>
+    <string name="pause_restart">重新开始</string>
+    <string name="pause_leave">保存并离开</string>
+    <string name="confirm_restart_title">重新开始这段航程？</string>
+    <string name="confirm_restart_body">当前航程将被新局替换，无法撤销。</string>
+    <string name="confirm_restart_action">重新开始</string>
+
+    <string name="settings_language">语言</string>
+    <string name="settings_language_system">跟随系统</string>
+    <string name="settings_language_zh">中文</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_sound">声音</string>
+    <string name="settings_sound_hint">柔和的骰子与落地提示音</string>
+    <string name="settings_reduced_motion">减少动态效果</string>
+    <string name="settings_reduced_hint">飞机直接滑到落点，骰子直接显示结果</string>
+    <string name="settings_speed">动效速度</string>
+    <string name="settings_speed_gentle">舒缓</string>
+    <string name="settings_speed_standard">标准</string>
+    <string name="settings_speed_quick">轻快</string>
+    <string name="settings_mode">你的游玩方式</string>
+    <string name="settings_mode_recommend">自动推荐走棋</string>
+    <string name="settings_mode_manual">自己选择飞机</string>
+    <string name="settings_mode_auto">全自动决策</string>
+    <string name="settings_mode_hint">下次投骰时生效</string>
+
+    <string name="rules_title">玩法说明</string>
+    <string name="rules_1">每队四架飞机，率先全部飞到中心者获胜。</string>
+    <string name="rules_2">掷出 6 才能出动飞机；掷出 6 之后再投一次。</string>
+    <string name="rules_3">落到本色格，向前连跳四格。</string>
+    <string name="rules_4">落到本色的环形标记格，沿虚线直接飞越对面航道，再连跳四格；停在被穿越航道格上的飞机会被送回机库。</string>
+    <string name="rules_5">落到对手飞机所在的格子，对手回机库；自己的飞机可以叠放。</string>
+    <string name="rules_6">必须精准到达中心，多出的步数退回。</string>
+    <string name="rules_7">真人与 AI 使用同样的规则和同一颗公平骰子。</string>
+
+    <string name="finish_title">全部平安归航</string>
+    <string name="finish_winner">%1$s 获胜</string>
+    <string name="finish_copy">第 %1$d 回合 · 这一队的飞机都到家了。</string>
+    <string name="finish_again">再来一局</string>
+    <string name="finish_home">返回主菜单</string>
+
+    <string name="access_die">骰子</string>
+    <string name="access_menu">打开局内菜单</string>
+</resources>

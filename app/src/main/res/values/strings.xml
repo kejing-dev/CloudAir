@@ -1,0 +1,125 @@
+<resources>
+    <string name="app_name">Cloud Air</string>
+    <string name="app_tagline">A little journey, right beside you</string>
+
+    <string name="control_window_title">Cloud Air</string>
+    <string name="board_window_title">Cloud airport</string>
+
+    <string name="home_hero">A little flight. A little calm.</string>
+    <string name="home_copy">Roll the die and watch your planes take off, jump and fly home.</string>
+    <string name="home_new">Start a new game</string>
+    <string name="home_continue">Continue game</string>
+    <string name="home_saved">%1$d seats · round %2$d · saved</string>
+    <string name="home_broken_save">A saved game could not be read</string>
+    <string name="home_context">Local turns · 2–4 seats · optional AI</string>
+
+    <string name="common_settings">Settings</string>
+    <string name="common_rules">How to play</string>
+    <string name="common_back">Back</string>
+    <string name="common_done">Done</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_menu">Menu</string>
+
+    <string name="setup_title">Ready for takeoff</string>
+    <string name="setup_seats">Seats</string>
+    <string name="setup_seat_count">%1$d seats</string>
+    <string name="setup_human">Human</string>
+    <string name="setup_ai_easy">AI · Easy</string>
+    <string name="setup_ai_smart">AI · Smart</string>
+    <string name="setup_human_required">Keep at least one human seat</string>
+    <string name="setup_start">Start game</string>
+    <string name="setup_replace_title">Begin a new journey?</string>
+    <string name="setup_replace_body">A saved game is on this device. Starting a new game replaces it.</string>
+    <string name="setup_replace_action">New game</string>
+
+    <string name="team_mint">Mint</string>
+    <string name="team_sky">Sky</string>
+    <string name="team_apricot">Apricot</string>
+    <string name="team_lavender">Lavender</string>
+    <string name="seat_label">%1$s fleet</string>
+
+    <string name="turn_yours">Your turn</string>
+    <string name="turn_ai">%1$s is thinking…</string>
+    <string name="turn_other_human">%1$s\'s turn</string>
+    <string name="turn_round">Round %1$d</string>
+    <string name="turn_roll">Roll the die</string>
+    <string name="turn_roll_hint">Tap the die on the board, or press here.</string>
+    <string name="turn_rolling">Rolling…</string>
+    <string name="turn_moving">Flying…</string>
+    <string name="turn_result">You rolled %1$d</string>
+    <string name="turn_extra">A six! Roll again</string>
+    <string name="turn_no_move">No plane can move this turn</string>
+    <string name="turn_need_six">Roll a six to launch a plane</string>
+    <string name="turn_six_no_move">No legal move, but a six still rolls again</string>
+    <string name="turn_home_count">%1$d/4</string>
+    <string name="turn_unsaved">Latest progress has not been saved</string>
+
+    <string name="choice_title">A six! How will you use it?</string>
+    <string name="choice_launch">Launch a new plane</string>
+    <string name="choice_advance">Move six spaces</string>
+    <string name="choice_launch_hint">The six places a plane on the launch pad</string>
+    <string name="choice_advance_hint">A recommended plane flies six spaces</string>
+    <string name="choice_launch_hint_manual">Then pick a plane in the hangar</string>
+    <string name="choice_advance_hint_manual">Then pick a plane in flight</string>
+    <string name="choice_plane">Choose a plane</string>
+    <string name="choice_plane_number">Plane %1$d</string>
+    <string name="choice_recommended">Recommended</string>
+    <string name="choice_in_hangar">In the hangar</string>
+    <string name="choice_progress">Space %1$d → %2$d</string>
+    <string name="choice_progress_finish">Space %1$d → home</string>
+    <string name="choice_back">Back to the six choice</string>
+
+    <string name="event_launch">%1$s plane %2$d took off</string>
+    <string name="event_move">%1$s plane %2$d moved %3$d</string>
+    <string name="event_jump">%1$s plane %2$d landed on its colour and jumped ahead</string>
+    <string name="event_fly">%1$s plane %2$d flew across the arm</string>
+    <string name="event_bounce">%1$s plane %2$d overshot and walked back</string>
+    <string name="event_capture">Sent %1$d opposing plane(s) back to the hangar</string>
+    <string name="event_home">%1$s plane %2$d is safely home</string>
+    <string name="event_pass">%1$s had no legal move</string>
+
+    <string name="pause_title">Game paused</string>
+    <string name="pause_copy">Take a breath. The journey can wait.</string>
+    <string name="pause_resume">Resume game</string>
+    <string name="pause_restart">Restart game</string>
+    <string name="pause_leave">Save and leave</string>
+    <string name="confirm_restart_title">Restart this game?</string>
+    <string name="confirm_restart_body">The current game is replaced by a new one. This cannot be undone.</string>
+    <string name="confirm_restart_action">Restart</string>
+
+    <string name="settings_language">Language</string>
+    <string name="settings_language_system">System</string>
+    <string name="settings_language_zh">中文</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_sound">Sound</string>
+    <string name="settings_sound_hint">Soft dice and landing sounds</string>
+    <string name="settings_reduced_motion">Reduce motion</string>
+    <string name="settings_reduced_hint">Planes slide straight to their destinations; the die shows its result at once</string>
+    <string name="settings_speed">Animation speed</string>
+    <string name="settings_speed_gentle">Gentle</string>
+    <string name="settings_speed_standard">Standard</string>
+    <string name="settings_speed_quick">Quick</string>
+    <string name="settings_mode">Your way to play</string>
+    <string name="settings_mode_recommend">Recommended moves</string>
+    <string name="settings_mode_manual">Choose planes myself</string>
+    <string name="settings_mode_auto">Fully automatic</string>
+    <string name="settings_mode_hint">Applies from the next roll</string>
+
+    <string name="rules_title">How to play</string>
+    <string name="rules_1">Four planes per fleet. Be the first to bring all four to the centre.</string>
+    <string name="rules_2">Roll a six to launch a plane, and roll again after any six.</string>
+    <string name="rules_3">Land on your own colour and jump four spaces ahead.</string>
+    <string name="rules_4">Land on the ringed space of your colour and fly straight across the opposite arm, then jump four more. A plane parked on the crossed lane is sent home.</string>
+    <string name="rules_5">Landing on other fleets sends them back to their hangar. Your own planes may share a space.</string>
+    <string name="rules_6">The centre needs an exact roll; any extra steps walk back.</string>
+    <string name="rules_7">Humans and AI play by the same rules and the same fair die.</string>
+
+    <string name="finish_title">All planes safely home</string>
+    <string name="finish_winner">%1$s wins</string>
+    <string name="finish_copy">Round %1$d · every plane of the fleet has landed.</string>
+    <string name="finish_again">Play again</string>
+    <string name="finish_home">Back to main menu</string>
+
+    <string name="access_die">Die</string>
+    <string name="access_menu">Open game menu</string>
+</resources>
