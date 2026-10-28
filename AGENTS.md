@@ -71,7 +71,8 @@ edge, column 0 the left edge; cell pitch `BoardLayout.CELL` = 0.72 / 15 m. `Boar
   (felt top = solver floor). The tray's inner box must stay the solver's 2.8 × 1.8 × 0.5 units × `DIE_SCALE`, so
   change `DiceSolver` and `tools/build_skin.py` together. The tap target is still the thin `trayShape` collider,
   never the GLB. Sounds come from `tools/make_sounds.py`. Keep peaks at -11 … -16 dBFS with nothing above
-  ~3 kHz, and check with `--check`.
+  ~3 kHz, and check with `--check`. The die and plane-move sounds (`SoundVariation.VARIED`) play with a random
+  rate of 0.93–1.07 that never repeats back to back, ±10 % volume, and rotate through their `_2` / `_3` variants.
 - Moves are timelines of clips (`Motion.kt`): walks are one hop per cell; the plane's attitude (pitch, bank, the
   fly-over barrel roll) lives on the `attitude` entity between holder and lift in `PlaneView`.
 

@@ -221,5 +221,30 @@ write('win', x, -11)
 x = 0.8 * mode(880, 0.012, 0.05, attack=0.0015) + 0.25 * mode(1760, 0.006, 0.05, attack=0.0015)
 write('tap', lowpass(x, 3000, passes=1), -13)
 
+# Variants (_2, _3) of the sounds that repeat a lot. SoundPlayer rotates them and adds a random pitch and
+# volume on top, so a run of hops or throws never repeats exactly. Own seeds: the files above stay as they were.
+for v in (2, 3):
+    r = random.Random(100 + v)
+    x = silence(0.28)
+    x = place(x, 0.30 * swish(0.22, 450 + 60 * v, 1200 + 120 * v, r), 0.0)
+    at = 0.0
+    for s in (0.55, 0.42, 0.3, 0.2)[:v + 1]:
+        x = place(x, knock(s * r.uniform(0.85, 1.1), r.uniform(0.3, 0.45), r), at)
+        at += r.uniform(0.04, 0.065)
+    write(f'dice_throw_{v}', x, -14)
+
+    x = silence(0.55)
+    at, s = 0.0, 1.0
+    for k in range(4 + v % 2):
+        x = place(x, knock(s, max(0.3, 0.7 - 0.1 * k), r), at)
+        at += r.uniform(0.06, 0.095) * (0.9 ** k)
+        s *= r.uniform(0.5, 0.65)
+    rustle = np.array([r.uniform(-1, 1) for _ in range(int(RATE * 0.3))])
+    rustle = lowpass(rustle, 650 + 50 * v) * np.exp(-t_axis(0.3) / 0.09) * attack_env(len(rustle), 0.01)
+    x = place(x, 0.12 * rustle, 0.01)
+    write(f'dice_land_{v}', x, -12)
+
+    write(f'hop_{v}', knock(1.0, 0.3 + 0.08 * v, random.Random(11 + v), seconds=0.07), -13)
+
 print('wrote', sorted(os.listdir(OUT)))
 check()
