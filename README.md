@@ -1,5 +1,7 @@
 # 云间航线 Cloud Air
 
+![Cloud Air](docs/vibelab/poster-2560x1440.jpg)
+
 Aeroplane chess (飞行棋) as a miniature airport on your table, for PICO OS 6 Shared Space.
 PICO Spatial SDK 6.1.9 · SpatialUI · Noto Sans · Kotlin.
 
